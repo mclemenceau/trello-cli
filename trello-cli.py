@@ -24,6 +24,8 @@ def main():
          default="{}/.trello.creds".format(default_config))
     parser.add_option(
         '-m', dest='member',help='filter with a specific team member', default='all')
+    parser.add_option(
+        '-o', dest='orphaned',help='show cards without member assigned to them',action='store_true')
 
     opts, args = parser.parse_args()
 
@@ -60,21 +62,34 @@ def main():
         if card.list_id in the_board_lanes.values():
             the_board_cards.append(card)
 
-    # Print active cards per member/lane
-    for member in the_board_members:
-        if poi == "all" or poi == member:
-            if len(list(filter(lambda x: the_board_members[member] in x.member_id,the_board_cards)))>0:
-                print(member)
-                for lane in the_board_lanes:
-                    card_list = []    
-                    for card in list(filter(lambda x: the_board_members[member] in x.member_id and 
-                                                    x.list_id == the_board_lanes[lane],the_board_cards)):
-                        card_list.append(card)
-                    if len(card_list) > 0:
-                        print("  {}".format(lane))
-                        for c in card_list:
-                            print("    * {}".format(c.name))
-                print(" ")
+    # Show Cards without Owner
+    if opts.orphaned:
+        for lane in the_board_lanes:
+            card_list = []    
+            for card in list(filter(lambda x: len(x.member_id) == 0 and 
+                                            x.list_id == the_board_lanes[lane],the_board_cards)):
+                card_list.append(card)
+            if len(card_list) > 0:
+                print("  {}".format(lane))
+                for c in card_list:
+                    print("    * {}".format(c.name))
+        print(" ")
+    else:
+        # Print active cards per member/lane
+        for member in the_board_members:
+            if poi == "all" or poi == member:
+                if len(list(filter(lambda x: the_board_members[member] in x.member_id,the_board_cards)))>0:
+                    print(member)
+                    for lane in the_board_lanes:
+                        card_list = []    
+                        for card in list(filter(lambda x: the_board_members[member] in x.member_id and 
+                                                        x.list_id == the_board_lanes[lane],the_board_cards)):
+                            card_list.append(card)
+                        if len(card_list) > 0:
+                            print("  {}".format(lane))
+                            for c in card_list:
+                                print("    * {}".format(c.name))
+                    print(" ")
 
 if __name__ == "__main__":
     main()
