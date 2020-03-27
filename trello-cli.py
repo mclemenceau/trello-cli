@@ -6,9 +6,6 @@ import json
 from trello import TrelloClient
 from optparse import OptionParser
 
-THE_BOARD_ID='hUIl3E3I'
-FRANKFURT_RETRO_2020_03='63fehZ0X'
-
 def main():
     parser = OptionParser(
         usage='Usage: %prog [options]')
