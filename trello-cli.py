@@ -10,23 +10,36 @@ THE_BOARD_ID='hUIl3E3I'
 FRANKFURT_RETRO_2020_03='63fehZ0X'
 
 def main():
-
-
-    # config_file = '/home/mclemenceau/.trello.creds'
-    
     parser = OptionParser(
         usage='Usage: %prog [options]')
 
-    #TODO Set the config file in more location and use $HOME env value
+    # look for the config file in ~/.trello.creds JSON
+    # Should contain two keys
+    #       api-key
+    #       token
     default_config=os.path.expanduser('~')
+    
+    # TODO allow to list boards you have access to
+    # TODO for a given board, list lanes (Active/Inactive/All)
+    # TODO for a given board, list cards per lane/members
+    # TODO only shows Cards with a given Labels
+    # TODO save current preferences into a config file (prefered board)
+
     parser.add_option(
          '-c', dest='credentials',help='location of the trello credential json file',
          default="{}/.trello.creds".format(default_config))
     parser.add_option(
         '-m', dest='member',help='filter with a specific team member', default='all')
     parser.add_option(
+        '-M', dest='show_members',help='Show all members available"',action='store_true')
+    parser.add_option(
         '-o', dest='orphaned',help='show cards without member assigned to them',action='store_true')
-
+    parser.add_option(
+        '-s', dest='show_labels',help='show labels with cards',action='store_true')
+    parser.add_option(
+        '-l', dest='lanes',help='show only cards in lanes "Lane1,Lane2,Lane3"')
+    parser.add_option(
+        '-L', dest='show_lanes',help='Show all Lanes available"',action='store_true')
     opts, args = parser.parse_args()
 
     try:
@@ -42,14 +55,28 @@ def main():
     the_board_cards = []
 
     # Pick The Board Open Lanes
-    the_board = client.get_board(THE_BOARD_ID)
+    the_board = client.get_board(THE_BOARD_ID)        
     for lane in the_board.get_lists('open'):
-        the_board_lanes[lane.name] = lane.id
+        if opts.show_lanes:
+            print(lane.name)
+        else:
+            if opts.lanes:
+                if lane.name in opts.lanes.split(","):
+                    the_board_lanes[lane.name] = lane.id
+            else:
+                the_board_lanes[lane.name] = lane.id
+
+    if opts.show_lanes: return 1
 
     # Capture the board members in a dictionary
     for member in the_board.get_members():
         the_board_members[member.full_name] = member.id
-    
+
+    if opts.show_members: 
+        for name in the_board_members.keys():
+            print(name)
+        return 1
+
     poi=opts.member
     if len(poi) > 0 and poi != 'all':
         for name in the_board_members.keys():
@@ -69,26 +96,37 @@ def main():
             for card in list(filter(lambda x: len(x.member_id) == 0 and 
                                             x.list_id == the_board_lanes[lane],the_board_cards)):
                 card_list.append(card)
-            if len(card_list) > 0:
+            if card_list:
                 print("  {}".format(lane))
                 for c in card_list:
-                    print("    * {}".format(c.name))
+                    card_labels = ""
+                    if card.labels and opts.show_labels: card_labels = " ".join("[" +label.name+ "]" for label in card.labels)
+                    if len(c.name)<70:
+                        print("    * {} {}".format(card_labels,c.name))
+                    else:
+                        print("    * {} {}...".format(card_labels,c.name[:68]))
         print(" ")
     else:
         # Print active cards per member/lane
         for member in the_board_members:
             if poi == "all" or poi == member:
-                if len(list(filter(lambda x: the_board_members[member] in x.member_id,the_board_cards)))>0:
+                if list(filter(lambda x: the_board_members[member] in x.member_id,the_board_cards)):
                     print(member)
                     for lane in the_board_lanes:
                         card_list = []    
                         for card in list(filter(lambda x: the_board_members[member] in x.member_id and 
                                                         x.list_id == the_board_lanes[lane],the_board_cards)):
                             card_list.append(card)
-                        if len(card_list) > 0:
+                        if card_list:
                             print("  {}".format(lane))
                             for c in card_list:
-                                print("    * {}".format(c.name))
+                                card_labels = ""
+                                if card.labels and opts.show_labels: card_labels = " ".join("[" +label.name+ "]" for label in card.labels)
+                                if len(c.name)<70:
+                                    print("    * {} {}".format(card_labels,c.name))
+                                else:
+                                    print("    * {} {}...".format(card_labels,c.name[:68]))
+
                     print(" ")
 
 if __name__ == "__main__":
