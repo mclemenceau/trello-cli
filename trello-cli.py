@@ -26,20 +26,25 @@ def main():
     # TODO save current preferences into a config file (prefered board)
 
     parser.add_option(
-         '-c', dest='credentials',help='location of the trello credential json file',
+         '-c', dest='credentials',help='location of the trello credential json file (default ~/.trello.creds    ',
          default="{}/.trello.creds".format(default_config))
     parser.add_option(
-        '-m', dest='member',help='filter with a specific team member', default='all')
+        '-b','--list-boards', dest='show_boards',help='List all Boards available"',action='store_true')
     parser.add_option(
-        '-M', dest='show_members',help='Show all members available"',action='store_true')
+        '-B','--board', dest='board',help='Active Board"')
+    parser.add_option(
+        '-l','--list-lanes', dest='show_lanes',help='List all Lanes available"',action='store_true')
+    parser.add_option(
+        '-m','--list-members', dest='show_members',help='List all members available"',action='store_true')
     parser.add_option(
         '-o', dest='orphaned',help='show cards without member assigned to them',action='store_true')
     parser.add_option(
         '-s', dest='show_labels',help='show labels with cards',action='store_true')
     parser.add_option(
-        '-l', dest='lanes',help='show only cards in lanes "Lane1,Lane2,Lane3"')
+        '-L', dest='lanes',help='show only cards in lanes "Lane1,Lane2,Lane3"')
     parser.add_option(
-        '-L', dest='show_lanes',help='Show all Lanes available"',action='store_true')
+        '-M', dest='member',help='filter with a specific team member', default='all')
+ 
     opts, args = parser.parse_args()
 
     try:
@@ -49,13 +54,32 @@ def main():
         print('Credentials file {} could not be parsed.'.format(opts.credentials))
         return 1
 
-    client = TrelloClient(api_key=config['api_key'],token=config['token'])
+    the_boards = {}
     the_board_lanes = {}
     the_board_members = {}
     the_board_cards = []
+    
+    #TODO Catch error opening Trello here
+    client = TrelloClient(api_key=config['api_key'],token=config['token'])
 
+    # Get the list of boards available to current user
+    for board in client.list_boards():
+        the_boards[board.name] = board.id
+        if opts.show_boards:
+            print(board.name)
+    
+    # Exit after returning the board list
+    if opts.show_boards: return 1
+    
+    #Pick the Active Board
+    if opts.board:
+        the_board = client.get_board(the_boards[opts.board])
+    else:
+        print("Active board missing, use -B \"Board Name\"")
+        parser.print_help()
+        return 0
+    
     # Pick The Board Open Lanes
-    the_board = client.get_board(THE_BOARD_ID)        
     for lane in the_board.get_lists('open'):
         if opts.show_lanes:
             print(lane.name)
