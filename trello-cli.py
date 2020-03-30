@@ -15,7 +15,20 @@ def drawCards(cardList,label=False):
                 print("    * {} {}".format(card_labels,card.name))
             else:
                 print("    * {} {}...".format(card_labels,card.name[:68]))
-    
+
+# Test if any subtring from the listNames is in the Name
+# For example   listNames = "bob,brian,mat"
+#               Name = matthias
+#               True
+# There has to be a better way to test this in Python ...
+def listInString(listNames,Name):
+    if listNames.split(","):
+        for s in listNames.split(","):
+            if s in Name:
+                return True
+    return False
+
+
 def main():
     parser = OptionParser(
         usage='Usage: %prog [options]')
@@ -46,7 +59,7 @@ def main():
     parser.add_option(
         '-s', dest='show_labels',help='show labels with cards',action='store_true')
     parser.add_option(
-        '-M', dest='member',help='filter with a specific team member (Name: display cards from specified member, all: display everyone, none: display unassigned cards)')
+        '-M', dest='members',help='filter with a specific team member (Names: coma separated list of names bob,sam,Luk all: display everyone, none: display unassigned cards)')
  
     opts, args = parser.parse_args()
 
@@ -113,20 +126,14 @@ def main():
     for card in the_board.open_cards():
         if card.list_id in the_board_lanes.values():
             the_board_cards.append(card)
-
-    poi=opts.member
-    if poi and poi != 'all':
-        for name in the_board_members.keys():
-            if poi in name:
-                poi = name
-                break   
+   
 
     # Simply show all the cards from said Lanes if no member selected 
-    if not opts.member:
+    if not opts.members:
         for lane in the_board_lanes:
             if the_board_cards : print("  {}".format(lane))
             drawCards(the_board_cards,opts.show_labels)
-    elif opts.member == "none":
+    elif opts.members.split(",")[0] == "none":
         for lane in the_board_lanes:
             card_list = []
             #Show the card only if nobody assigned to it and the lane is in the list    
@@ -138,7 +145,7 @@ def main():
     else:
         # Print active cards per member/lane
         for member in the_board_members:
-            if poi == "all" or poi == member:
+            if opts.members.split(",")[0] == "all" or listInString(opts.members,member):
                 if list(filter(lambda x: the_board_members[member] in x.member_id,the_board_cards)):
                     print(member)
                     for lane in the_board_lanes:
