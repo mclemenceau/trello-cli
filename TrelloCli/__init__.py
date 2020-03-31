@@ -1,6 +1,3 @@
 import os
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-__version__ = read('VERSION.txt')
+__version__ = '0.0.1'

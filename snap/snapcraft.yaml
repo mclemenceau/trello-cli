@@ -1,6 +1,6 @@
 name: trello-cli
 base: core18
-version: git
+version: '0.0.1'
 summary: Command Line Interface for Trello 
 description: |
   trello-cli allows you to query to find informations about your Trello Data
@@ -10,13 +10,13 @@ grade: devel
 confinement: devmode
 
 parts:
-  pyinstall:
+  trello-cli:
     plugin: python
-    python-packages:
-      - trello
     python-version: python3
+    python-packages:
+      - py-trello
     source: .
 
-  my-part:
-    plugin: dump
-    source: .
+apps:
+  trello-cli:
+    command: bin/trello-cli

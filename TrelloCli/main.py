@@ -2,6 +2,7 @@
 import sys
 import os
 import json
+import getpass
 
 from trello import TrelloClient
 from optparse import OptionParser
@@ -37,7 +38,7 @@ def main():
     # Should contain two keys
     #       api-key
     #       token
-    default_config=os.path.expanduser('~')
+    default_config="/home/" + str(getpass.getuser())
     
     # TODO only shows Cards with a given Labels
     # TODO save current preferences into a config file (prefered board)

@@ -13,7 +13,8 @@ setup(
     license = "GPLv3",
     keywords = "",
     url = "https://github.com/mclemenceau/trello-cli",
-    packages=['TrelloCli', 'tests'],
+    packages=['TrelloCli'],
+    scripts=["bin/trello-cli"],
     long_description=read('README.md'),
     classifiers=[
         "Development Status :: 3 - Alpha",
