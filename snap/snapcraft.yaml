@@ -1,0 +1,22 @@
+name: trello-cli
+base: core18
+version: git
+summary: Command Line Interface for Trello 
+description: |
+  trello-cli allows you to query to find informations about your Trello Data
+  trello cli can list boards, lanes and show cards by user
+
+grade: devel
+confinement: devmode
+
+parts:
+  pyinstall:
+    plugin: python
+    python-packages:
+      - trello
+    python-version: python3
+    source: .
+
+  my-part:
+    plugin: dump
+    source: .
