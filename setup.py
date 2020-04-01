@@ -19,6 +19,6 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: GPLv3 License",
     ],
 )
