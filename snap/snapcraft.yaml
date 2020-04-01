@@ -1,13 +1,13 @@
 name: trello-cli
 base: core18
-version: '0.0.1'
+version: '0.0.2'
 summary: Command Line Interface for Trello 
 description: |
   trello-cli allows you to query to find informations about your Trello Data
   trello cli can list boards, lanes and show cards by user
 
-grade: devel
-confinement: devmode
+grade: stable
+confinement: strict
 
 parts:
   trello-cli:
@@ -20,3 +20,4 @@ parts:
 apps:
   trello-cli:
     command: bin/trello-cli
+    plugs: [network]

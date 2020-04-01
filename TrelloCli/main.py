@@ -38,7 +38,7 @@ def main():
     # Should contain two keys
     #       api-key
     #       token
-    default_config="/home/" + str(getpass.getuser())
+    default_config=os.path.expanduser('~')
     
     # TODO only shows Cards with a given Labels
     # TODO save current preferences into a config file (prefered board)
