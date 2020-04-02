@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "TrelloCli",
-    version = "0.0.1",
+    version = "0.0.3",
     author = "Matthieu Clemenceau",
     author_email = "matthieu.clemenceau@canonical.com",
     description = ("A Command Line helper to access Trello Data."),

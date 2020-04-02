@@ -1,6 +1,6 @@
 name: trello-cli
 base: core18
-version: '0.0.2'
+version: '0.0.3'
 summary: Command Line Interface for Trello 
 description: |
   trello-cli allows you to query to find informations about your Trello Data
@@ -21,3 +21,5 @@ apps:
   trello-cli:
     command: bin/trello-cli
     plugs: [network]
+    environment:
+      LANG: C.UTF-8
