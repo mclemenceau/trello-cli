@@ -67,9 +67,28 @@ def main():
     try:
         with open(opts.credentials) as f:
             config = json.load(f)
+            trello_api_key = config['api_key']
+            trello_token = config['token']
     except (FileNotFoundError, json.JSONDecodeError):
-        print('Credentials file {} could not be parsed.'.format(opts.credentials))
-        return 1
+        print('Trello Token information file {} could not be found or parsed.'.format(opts.credentials))
+        print('')
+        gather_token = input('Do you want to entre your Trello token information now (see https://trello.com/app-key/) ? (Y/n) ')
+        if gather_token == 'n':
+            return 1
+        trello_api_key = input('Please enter your Trello api key : ')
+        trello_token = input('Please enter your Trello api token : ')
+        save_token = input('Do you want to save those credentials for future use of trerllo-cli? (Y/n) ')
+        if save_token != 'n':
+            try:
+                data = {}
+                data['api_key'] = trello_api_key
+                data['token'] = trello_token
+                with open(opts.credentials,'w+') as f:
+                    json.dump(data,(f))
+            except (FileNotFoundError, json.JSONDecodeError):
+                # TODO: Probably better error handling can be done here
+                print("Something went wrong saving credentials")
+                return 1
 
     the_boards = {}
     the_board_lanes = {}
@@ -77,7 +96,7 @@ def main():
     the_board_cards = []
     
     #TODO Catch error opening Trello here
-    client = TrelloClient(api_key=config['api_key'],token=config['token'])
+    client = TrelloClient(api_key=trello_api_key,token=trello_token)
 
     # Get the list of boards available to current user
     for board in client.list_boards():
